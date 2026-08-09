@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NetGenie — Telecom NOC Copilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;
+    --panel:#121826;
+    --panel-alt:#17202F;
+    --line:#232C3D;
+    --text:#E6EDF3;
+    --muted:#7C8798;
+    --cyan:#3DDBD9;
+    --amber:#F5A623;
+    --red:#E5484D;
+    --green:#34D399;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans',sans-serif;
+    min-height:100vh;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px;}
+
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+  .brand-eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--cyan);margin-bottom:6px;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;font-size:34px;letter-spacing:-0.01em;margin:0;
+  }
+  .subtitle{color:var(--muted);font-size:14px;margin-top:6px;max-width:520px;}
+
+  .status-row{display:flex;gap:14px;flex-wrap:wrap;}
+  .status-chip{
+    display:flex;align-items:center;gap:7px;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);
+    background:var(--panel);border:1px solid var(--line);border-radius:100px;
+    padding:6px 12px;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex:none;}
+  .dot.ok{background:var(--green);box-shadow:0 0 8px var(--green);}
+  .dot.bad{background:var(--red);box-shadow:0 0 8px var(--red);}
+  .dot.warn{background:var(--amber);}
+
+  /* signature element: animated signal trace divider */
+  .trace-divider{width:100%;height:26px;margin:22px 0 26px;overflow:hidden;}
+  .trace-divider svg{width:100%;height:100%;display:block;}
+  .trace-divider path{
+    fill:none;stroke:var(--cyan);stroke-width:1.4;opacity:.55;
+    stroke-dasharray:6 5;
+    animation:trace-flow 3.2s linear infinite;
+  }
+  @keyframes trace-flow{ to{ stroke-dashoffset:-220; } }
+
+  main{display:grid;grid-template-columns:1.5fr 1fr;gap:20px;}
+  @media (max-width:880px){ main{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    display:flex;flex-direction:column;
+    height:min(680px, 75vh);
+  }
+  .panel-head{
+    padding:14px 18px;border-bottom:1px solid var(--line);
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .panel-head span.tag{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.08em;
+  }
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;padding:14px 18px 0;}
+  .chip{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--cyan);
+    background:rgba(61,219,217,.08);border:1px solid rgba(61,219,217,.35);
+    border-radius:100px;padding:6px 11px;cursor:pointer;
+  }
+  .chip:hover{background:rgba(61,219,217,.16);}
+
+  .backend-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 18px 0;}
+  .backend-label{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+  .backend-opt{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);
+    background:var(--panel-alt);border:1px solid var(--line);
+    border-radius:100px;padding:6px 12px;cursor:pointer;user-select:none;
+  }
+  .backend-opt.selected{color:var(--cyan);border-color:rgba(61,219,217,.5);background:rgba(61,219,217,.1);}
+  .backend-opt.disabled{opacity:.4;cursor:not-allowed;}
+
+  .messages{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:14px;}
+  .msg{max-width:92%;padding:11px 14px;border-radius:10px;font-size:14px;line-height:1.5;white-space:pre-wrap;}
+  .msg.user{align-self:flex-end;background:var(--panel-alt);border:1px solid var(--line);}
+  .msg.agent{align-self:flex-start;background:rgba(61,219,217,.06);border:1px solid rgba(61,219,217,.22);font-family:'IBM Plex Mono',monospace;font-size:12.8px;}
+  .msg.blocked{border-color:rgba(229,72,77,.5);background:rgba(229,72,77,.08);}
+  .msg .meta{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase;}
+
+  .composer{border-top:1px solid var(--line);padding:12px 14px;display:flex;gap:10px;}
+  .composer input{
+    flex:1;background:var(--panel-alt);border:1px solid var(--line);border-radius:9px;
+    color:var(--text);padding:11px 13px;font-size:14px;font-family:'IBM Plex Sans',sans-serif;
+  }
+  .composer input:focus{outline:1px solid var(--cyan);}
+  .composer button{
+    background:var(--cyan);color:#062023;border:none;border-radius:9px;
+    padding:0 18px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;cursor:pointer;
+  }
+  .composer button:disabled{opacity:.4;cursor:default;}
+
+  .trace-list{padding:14px 18px;overflow-y:auto;flex:1;}
+  .trace-empty{color:var(--muted);font-size:13px;font-family:'IBM Plex Mono',monospace;padding:6px 2px;}
+  .step{display:flex;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line);}
+  .step:last-child{border-bottom:none;}
+  .step-index{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);
+    width:20px;flex:none;padding-top:2px;
+  }
+  .step-body{flex:1;}
+  .step-tool{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--cyan);}
+  .step-summary{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .step-latency{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);
+    flex:none;align-self:center;
+  }
+  .sources{padding:12px 18px 16px;border-top:1px solid var(--line);}
+  .sources .label{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+  .source-pill{
+    display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;
+    background:var(--panel-alt);border:1px solid var(--line);border-radius:6px;
+    padding:4px 8px;margin:0 6px 6px 0;color:var(--text);
+  }
+
+  footer{margin-top:26px;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  footer a{color:var(--cyan);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand-eyebrow">OPEA-based · Telecom NOC Copilot</div>
+      <h1>NetGenie</h1>
+      <div class="subtitle">Multi-agent assistant over live KPI/alarm telemetry and incident runbooks — built on an OPEA-style microservice mega-service.</div>
+    </div>
+    <div class="status-row" id="statusRow">
+      <div class="status-chip"><span class="dot" id="dot-gateway"></span>gateway</div>
+      <div class="status-chip"><span class="dot" id="dot-guardrails"></span>guardrails</div>
+      <div class="status-chip"><span class="dot" id="dot-retrieval_worker"></span>retrieval</div>
+      <div class="status-chip"><span class="dot" id="dot-telemetry_worker"></span>telemetry</div>
+    </div>
+  </header>
+
+  <div class="trace-divider">
+    <svg viewBox="0 0 1000 26" preserveAspectRatio="none">
+      <path d="M0,13 L60,13 L75,4 L95,22 L115,4 L135,22 L155,13 L1000,13" />
+    </svg>
+  </div>
+
+  <main>
+    <section class="panel">
+      <div class="panel-head">Console <span class="tag">POST /v1/chat</span></div>
+      <div class="backend-row" id="backendRow">
+        <span class="backend-label">Backend</span>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="messages" id="messages"></div>
+      <div class="composer">
+        <input id="input" type="text" placeholder="Ask about a KPI, alarm, or incident runbook…" />
+        <button id="send">Send</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">Agent Trace <span class="tag" id="reqId">—</span></div>
+      <div class="trace-list" id="trace">
+        <div class="trace-empty">No trace yet. Ask a question to see the agent's reasoning path — which tools it called, in what order, and how long each took.</div>
+      </div>
+      <div class="sources" id="sourcesBox" style="display:none;">
+        <div class="label">Sources</div>
+        <div id="sourcesList"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>NetGenie · demo dataset is synthetic · no real subscriber data · <a href="/health" target="_blank">/health</a> · <a href="/metrics" target="_blank">/metrics</a></footer>
+</div>
+
+<script>
+const SAMPLE_PROMPTS = [
+  "What's the dropped call rate in the South region?",
+  "How do I respond to a fiber cut?",
+  "Congestion is rising in South — what's the KPI trend and what should I do?",
+  "List critical alarms right now",
+  "What's the latency trend by region?",
+];
+
+const chipsEl = document.getElementById('chips');
+SAMPLE_PROMPTS.forEach(p => {
+  const c = document.createElement('div');
+  c.className = 'chip';
+  c.textContent = p;
+  c.onclick = () => { document.getElementById('input').value = p; sendMessage(); };
+  chipsEl.appendChild(c);
+});
+
+const messagesEl = document.getElementById('messages');
+const inputEl = document.getElementById('input');
+const sendBtn = document.getElementById('send');
+const traceEl = document.getElementById('trace');
+const reqIdEl = document.getElementById('reqId');
+const sourcesBox = document.getElementById('sourcesBox');
+const sourcesList = document.getElementById('sourcesList');
+const backendRow = document.getElementById('backendRow');
+
+let selectedBackend = null; // resolved after /v1/backends loads
+
+async function loadBackends(){
+  try{
+    const res = await fetch('/v1/backends');
+    const data = await res.json();
+    selectedBackend = data.default;
+    data.backends.forEach(b => {
+      const opt = document.createElement('div');
+      opt.className = 'backend-opt' + (b.id === selectedBackend ? ' selected' : '') + (b.available ? '' : ' disabled');
+      opt.textContent = b.label + (b.available ? '' : ' (unavailable)');
+      opt.title = b.available ? 'Use this backend for the next question' : 'Not configured (missing API key) — falls back to mock if selected';
+      opt.onclick = () => {
+        if(!b.available) return; // still clickable-safe server-side, but keep UI honest
+        selectedBackend = b.id;
+        [...backendRow.querySelectorAll('.backend-opt')].forEach(el => el.classList.remove('selected'));
+        opt.classList.add('selected');
+      };
+      backendRow.appendChild(opt);
+    });
+  }catch(err){
+    // backend picker is a nice-to-have; chat still works with the server default if this fails
+    selectedBackend = null;
+  }
+}
+loadBackends();
+
+function addMessage(role, text, blocked){
+  const div = document.createElement('div');
+  div.className = 'msg ' + role + (blocked ? ' blocked' : '');
+  const meta = document.createElement('span');
+  meta.className = 'meta';
+  meta.textContent = role === 'user' ? 'operator' : (blocked ? 'blocked' : 'netgenie');
+  div.appendChild(meta);
+  div.appendChild(document.createTextNode(text));
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function renderTrace(trace, requestId){
+  reqIdEl.textContent = '#' + requestId;
+  traceEl.innerHTML = '';
+  trace.forEach(step => {
+    const row = document.createElement('div');
+    row.className = 'step';
+    const color = step.latency_ms > 400 ? 'warn' : 'ok';
+    row.innerHTML = `
+      <div class="step-index">${String(step.step).padStart(2,'0')}</div>
+      <div class="step-body">
+        <div class="step-tool"><span class="dot ${color}" style="display:inline-block;margin-right:6px;"></span>${step.tool}</div>
+        <div class="step-summary">${step.summary}</div>
+      </div>
+      <div class="step-latency">${step.latency_ms} ms</div>`;
+    traceEl.appendChild(row);
+  });
+}
+
+function renderSources(sources){
+  if(!sources || sources.length === 0){ sourcesBox.style.display = 'none'; return; }
+  sourcesBox.style.display = 'block';
+  sourcesList.innerHTML = '';
+  sources.forEach(s => {
+    const pill = document.createElement('span');
+    pill.className = 'source-pill';
+    pill.textContent = s;
+    sourcesList.appendChild(pill);
+  });
+}
+
+async function sendMessage(){
+  const text = inputEl.value.trim();
+  if(!text) return;
+  addMessage('user', text);
+  inputEl.value = '';
+  sendBtn.disabled = true;
+
+  try{
+    const res = await fetch('/v1/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({message: text, backend: selectedBackend})
+    });
+    const data = await res.json();
+    addMessage('agent', data.answer, data.blocked);
+    renderTrace(data.trace, data.request_id);
+    renderSources(data.sources);
+  }catch(err){
+    addMessage('agent', 'Gateway unreachable: ' + err, true);
+  }finally{
+    sendBtn.disabled = false;
+  }
+}
+
+sendBtn.onclick = sendMessage;
+inputEl.addEventListener('keydown', e => { if(e.key === 'Enter') sendMessage(); });
+
+async function pollHealth(){
+  try{
+    const res = await fetch('/health');
+    const data = await res.json();
+    document.getElementById('dot-gateway').className = 'dot ' + (data.status === 'ok' ? 'ok' : 'warn');
+    for(const [name, info] of Object.entries(data.services || {})){
+      const el = document.getElementById('dot-' + name);
+      if(el) el.className = 'dot ' + (info.status === 'ok' ? 'ok' : 'bad');
+    }
+  }catch(err){
+    document.getElementById('dot-gateway').className = 'dot bad';
+  }
+}
+pollHealth();
+setInterval(pollHealth, 8000);
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+version: "3.9"
+
+services:
+  guardrails:
+    build:
+      context: .
+      dockerfile: services/guardrails/Dockerfile
+    ports:
+      - "${GUARDRAILS_PORT:-6001}:6001"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:6001/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  retrieval_worker:
+    build:
+      context: .
+      dockerfile: services/retrieval_worker/Dockerfile
+    ports:
+      - "${RETRIEVAL_PORT:-6002}:6002"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:6002/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  telemetry_worker:
+    build:
+      context: .
+      dockerfile: services/telemetry_worker/Dockerfile
+    ports:
+      - "${TELEMETRY_PORT:-6003}:6003"
+    environment:
+      - MOCK_LLM=${MOCK_LLM:-true}
+      - DEFAULT_BACKEND=${DEFAULT_BACKEND:-mock}
+      - LLM_BASE_URL=${LLM_BASE_URL:-http://ollama:11434/v1}
+      - LLM_API_KEY=${LLM_API_KEY:-not-needed}
+      - LLM_MODEL=${LLM_MODEL:-llama3.1:8b}
+      - LLM_TIMEOUT_S=${LLM_TIMEOUT_S:-30}
+      - LOCAL_LLM_BASE_URL=${LOCAL_LLM_BASE_URL:-http://ollama:11434/v1}
+      - LOCAL_LLM_MODEL=${LOCAL_LLM_MODEL:-llama3.2:3b}
+      - LOCAL_LLM_API_KEY=${LOCAL_LLM_API_KEY:-not-needed}
+      - GROQ_BASE_URL=${GROQ_BASE_URL:-https://api.groq.com/openai/v1}
+      - GROQ_MODEL=${GROQ_MODEL:-llama-3.3-70b-versatile}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:6003/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    ports:
+      - "${GATEWAY_PORT:-9000}:9000"
+    environment:
+      - MOCK_LLM=${MOCK_LLM:-true}
+      - DEFAULT_BACKEND=${DEFAULT_BACKEND:-mock}
+      - LLM_BASE_URL=${LLM_BASE_URL:-http://ollama:11434/v1}
+      - LLM_API_KEY=${LLM_API_KEY:-not-needed}
+      - LLM_MODEL=${LLM_MODEL:-llama3.1:8b}
+      - LLM_TIMEOUT_S=${LLM_TIMEOUT_S:-30}
+      - WORKER_TIMEOUT_S=${WORKER_TIMEOUT_S:-90}
+      - LOCAL_LLM_BASE_URL=${LOCAL_LLM_BASE_URL:-http://ollama:11434/v1}
+      - LOCAL_LLM_MODEL=${LOCAL_LLM_MODEL:-llama3.2:3b}
+      - LOCAL_LLM_API_KEY=${LOCAL_LLM_API_KEY:-not-needed}
+      - GROQ_BASE_URL=${GROQ_BASE_URL:-https://api.groq.com/openai/v1}
+      - GROQ_MODEL=${GROQ_MODEL:-llama-3.3-70b-versatile}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - GUARDRAILS_URL=http://guardrails:6001
+      - RETRIEVAL_URL=http://retrieval_worker:6002
+      - TELEMETRY_URL=http://telemetry_worker:6003
+    depends_on:
+      guardrails:
+        condition: service_healthy
+      retrieval_worker:
+        condition: service_healthy
+      telemetry_worker:
+        condition: service_healthy
+
+  # Optional: only started with `docker compose --profile llm up`.
+  # Provides the "local" backend -- a small, CPU-friendly OpenAI-compatible
+  # model (default llama3.2:3b, override with LOCAL_LLM_MODEL).
+  # After it starts: `docker exec -it netgenie-ollama-1 ollama pull llama3.2:3b`
+  # The "groq" backend needs no local container at all -- just set
+  # GROQ_API_KEY in .env and it's selectable immediately, no --profile llm
+  # required, no download.
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["llm"]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+volumes:
+  ollama_data:

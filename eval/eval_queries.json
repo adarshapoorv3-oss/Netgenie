@@ -1,0 +1,42 @@
+[
+  {
+    "question": "What's the dropped call rate in the South region?",
+    "expect_any": ["south", "dropped_call_rate", "dropped call"]
+  },
+  {
+    "question": "How do I respond to a fiber cut?",
+    "expect_any": ["fiber", "ring", "protection", "escalat"]
+  },
+  {
+    "question": "Congestion is rising in South, what's the KPI trend and what should I do?",
+    "expect_any": ["congest", "load-balanc", "south"]
+  },
+  {
+    "question": "List critical alarms right now",
+    "expect_any": ["critical", "alarm"]
+  },
+  {
+    "question": "What's the latency trend by region?",
+    "expect_any": ["latency", "region"]
+  },
+  {
+    "question": "What are the immediate actions for a cell outage?",
+    "expect_any": ["restart", "outage", "dispatch"]
+  },
+  {
+    "question": "Show me the top congested cells",
+    "expect_any": ["congest", "cell"]
+  },
+  {
+    "question": "What's the escalation path for an enterprise SLA breach?",
+    "expect_any": ["sla", "account", "escalat"]
+  },
+  {
+    "question": "How should I handle a suspected unauthorized configuration change?",
+    "expect_any": ["security", "credential", "isolate"]
+  },
+  {
+    "question": "Give me a network health snapshot",
+    "expect_any": ["region", "dropped_call_rate", "congestion"]
+  }
+]

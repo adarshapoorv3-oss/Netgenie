@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.run/
+data/telemetry.db
+data/telemetry_test.db
+eval/report.md
+.pytest_cache/

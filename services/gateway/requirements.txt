@@ -1,0 +1,21 @@
+# fastapi/uvicorn/pydantic/httpx are intentionally UNPINNED here.
+# opea-comps pins fastapi==0.124.0 exactly; pinning our own conflicting
+# version (e.g. fastapi==0.115.0) makes pip's resolver fail outright
+# ("ResolutionImpossible"). Letting pip solve to whatever opea-comps
+# requires is the correct fix, not a workaround -- verified the gateway's
+# actual FastAPI/Pydantic usage (basic routes, BaseModel, StaticFiles)
+# works unchanged under 0.124.0.
+fastapi
+uvicorn[standard]
+pydantic
+httpx
+# prometheus-client is also unpinned for the same reason -- opea-comps
+# pins prometheus-client==0.22.1. The gateway only uses the stable
+# Counter/Histogram/generate_latest/CONTENT_TYPE_LATEST API, unaffected
+# across 0.20.x -> 0.22.x.
+fastapi
+uvicorn[standard]
+pydantic
+httpx
+prometheus-client
+opea-comps==1.5
