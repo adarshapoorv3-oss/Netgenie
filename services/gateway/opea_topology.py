@@ -1,3 +1,5 @@
+# Copyright 2026 NetGenie Contributors
+# SPDX-License-Identifier: Apache-2.0
 """
 Builds NetGenie's mega-service topology using OPEA's own orchestration
 primitives (the `opea-comps` package, i.e. `comps.cores.mega`) instead of
