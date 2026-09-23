@@ -1,3 +1,5 @@
+# Copyright 2026 NetGenie Contributors
+# SPDX-License-Identifier: Apache-2.0
 """
 Thin OpenAI-compatible chat client shared by every worker.
 
