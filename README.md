@@ -153,6 +153,22 @@ PYTHONPATH=. MOCK_LLM=true pytest tests/ -v
 
 All telemetry data (`services/telemetry_worker/seed_kpi.py`) is synthetically generated at first run. No real subscriber, customer, or network data is used anywhere in this project.
 
+## Third-party components
+
+[#third-party-components](#third-party-components)
+
+| Component | License | Purpose |
+|---|---|---|
+| [`opea-comps`](https://pypi.org/project/opea-comps/) (opea-project/GenAIComps) | Apache-2.0 | Real `comps.cores.mega.ServiceOrchestrator` DAG for worker registration and fan-out routing |
+| fastapi | MIT | Web framework for all 4 microservices |
+| uvicorn | BSD-3-Clause | ASGI server |
+| pydantic | MIT | Request/response validation |
+| httpx | BSD-3-Clause | HTTP client (LLM backend calls, inter-service calls) |
+| rank-bm25 | Apache-2.0 | BM25 lexical retrieval over runbooks |
+| prometheus-client | Apache-2.0 | Metrics |
+
+All are Apache-2.0/MIT/BSD compatible. Full transitive dependency tree audited via `pip-licenses`; no GPL/LGPL/AGPL packages found. One transitive dependency, `certifi` (pulled in by `httpx`), is MPL-2.0 — a data-only CA-bundle package that is a de facto standard across nearly the entire Python HTTPS ecosystem; flagged here for transparency rather than treated as a substitive risk.
+
 ## License
 
 Apache License 2.0 — see [`LICENSE`](./LICENSE).
