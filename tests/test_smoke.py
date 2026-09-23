@@ -1,3 +1,5 @@
+# Copyright 2026 NetGenie Contributors
+# SPDX-License-Identifier: Apache-2.0
 """
 Fast, offline smoke tests -- no Docker, no network, no LLM required.
 Run with:  PYTHONPATH=. MOCK_LLM=true pytest tests/ -v
