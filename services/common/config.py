@@ -3,6 +3,8 @@ Shared configuration for all NetGenie OPEA microservices.
 Every service reads the same environment variables so the whole
 mega-service can be reconfigured from one .env file.
 """
+# Copyright 2026 NetGenie Contributors
+# SPDX-License-Identifier: Apache-2.0
 import os
 
 
