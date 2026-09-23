@@ -1,3 +1,5 @@
+# Copyright 2026 NetGenie Contributors
+# SPDX-License-Identifier: Apache-2.0
 """
 Turns the markdown runbooks in data/runbooks/ into retrievable chunks.
 
