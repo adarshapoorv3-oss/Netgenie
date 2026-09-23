@@ -1,3 +1,5 @@
+# Copyright 2026 NetGenie Contributors
+# SPDX-License-Identifier: Apache-2.0
 """
 Generates a small, deterministic synthetic telecom KPI + alarms dataset
 so the telemetry worker has something realistic to query out of the box.
