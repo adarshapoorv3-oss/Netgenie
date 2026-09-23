@@ -5,5 +5,4 @@ __pycache__/
 .run/
 data/telemetry.db
 data/telemetry_test.db
-eval/report.md
 .pytest_cache/
