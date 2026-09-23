@@ -1,8 +1,8 @@
-fastapi==0.115.0
-uvicorn[standard]==0.30.6
-pydantic==2.9.2
-httpx==0.27.2
+fastapi
+uvicorn[standard]
+pydantic
+httpx
 rank-bm25==0.2.2
-prometheus-client==0.20.0
-pytest==8.3.3 
+prometheus-client
+pytest==8.3.3
 opea-comps==1.5
