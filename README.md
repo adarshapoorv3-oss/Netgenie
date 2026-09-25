@@ -6,6 +6,10 @@ Submitted to the *ITU FG-AINN / AI for Good ML5G Innovation Challenge on Generat
 
 NetGenie answers the two questions a Network Operations Center engineer asks all day — **"what's happening right now"** (live KPI/alarm telemetry) and **"what do I do about it"** (incident runbooks) — through one conversational interface, backed by a supervisor agent that decides which specialist worker(s) a question actually needs and shows its work.
 
+Article Published: *https://medium.com/@adarshapoorv9/building-a-telecom-noc-copilot-on-opea-what-actually-wiring-serviceorchestrator-taught-us-af09eaca476d?postPublishedType=initial* 
+
+Upstream Contribution: *https://github.com/issues/created?issue=opea-project%7CGenAIComps%7C2168&issue_global_id=I_kwDOLwXp888AAAABMA9bEQ*
+
 ---
 
 ## Why this fits the brief
