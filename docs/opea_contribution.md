@@ -1,4 +1,4 @@
-# OPEA open-source contribution (drafted, not yet filed)
+# OPEA open-source contribution 
 
 This is written to file as a GitHub issue (or a docs PR) against
 `opea-project/GenAIComps`. It documents a real gap we hit integrating
