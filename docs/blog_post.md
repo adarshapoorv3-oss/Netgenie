@@ -1,6 +1,6 @@
 # Building a Telecom NOC Copilot on OPEA: What Actually Wiring `ServiceOrchestrator` Taught Us
 
-*Draft for dev.to / Medium / GitHub Discussions — edit the intro paragraph with your name/team before publishing.*
+Published : *https://medium.com/@adarshapoorv9/building-a-telecom-noc-copilot-on-opea-what-actually-wiring-serviceorchestrator-taught-us-af09eaca476d?postPublishedType=initial*
 
 ## The problem
 
@@ -86,4 +86,4 @@ on request; and closing the loop by logging which suggested remediations
 operators actually accepted, so the system's suggestions can be evaluated
 against real outcomes over time.
 
-Code: *[link to your GitHub repo once published]*
+Code: *https://github.com/adarshapoorv3-oss/Netgenie/*
