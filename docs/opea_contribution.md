@@ -66,7 +66,6 @@ both options here since the choice affects which we submit.
 
 ## Status
 
-Not yet filed — filing requires a GitHub account with write access to
-open issues/PRs on `opea-project/GenAIComps`, which has to happen from
-your account, not from this environment. See the top-level guide for the
-exact steps.
+Upstream Contribution: https://github.com/issues/created?issue=opea-project%7CGenAIComps%7C2168&issue_global_id=I_kwDOLwXp888AAAABMA9bEQ
+
+
